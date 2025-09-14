@@ -43,7 +43,7 @@ object Main extends App {
 
   // Start the HTTP server (this returns immediately with a Future)
   val bindingFuture: Future[Http.ServerBinding] = Http()
-    .newServerAt("localhost", 8080)  // interface and port
+    .newServerAt("0.0.0.0", 8080)  // Changed from localhost to 0.0.0.0 to accept external connections
     .bind(routes)                    // bind our route tree
 
   // Handle server startup - this is crucial for debugging
