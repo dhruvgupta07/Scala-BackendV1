@@ -49,18 +49,31 @@ object Main extends App {
 
       Runtime.getRuntime.addShutdownHook(new Thread(() => {
         system.log.info("🔄 Received shutdown signal. Starting graceful shutdown...")
-        val shutdownF = binding.terminate(30.seconds).flatMap { _ =>
-          system.log.info("✅ Server shutdown completed")
-          system.whenTerminated
+        try {
+          val shutdownF = binding.terminate(30.seconds).flatMap { _ =>
+            system.log.info("✅ Server shutdown completed")
+            system.whenTerminated
+          }
+          Await.result(shutdownF, 40.seconds)
+        } catch {
+          case ex: Throwable =>
+            system.log.error("❌ Error during shutdown: {}", ex.getMessage)
+            system.terminate()
         }
-        Await.result(shutdownF, 40.seconds)
       }))
 
     case Failure(ex) =>
-      system.log.error("Failed to bind HTTP endpoint, terminating system", ex)
-      system.whenTerminated
+      system.log.error("❌ Failed to bind HTTP endpoint, terminating system: {}", ex.getMessage)
+      system.terminate()
+      System.exit(1)  // Ensure container restarts on binding failure
   }
 
   // Keep the application running indefinitely
-  Await.result(system.whenTerminated, Duration.Inf)
+  try {
+    Await.result(system.whenTerminated, Duration.Inf)
+  } catch {
+    case ex: Throwable =>
+      system.log.error("❌ Fatal error, system terminating: {}", ex.getMessage)
+      System.exit(1)  // Ensure container restarts on fatal errors
+  }
 }
