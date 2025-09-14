@@ -6,9 +6,10 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import com.routes.UserRoutes
 import com.services.UserServices
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future, Promise, Await}
 import scala.util.{Failure, Success}
 import scala.concurrent.duration._
+import akka.Done
 import scala.io.StdIn
 
 object Main extends App {
