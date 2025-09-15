@@ -38,44 +38,39 @@ object Main extends App {
     |        .put { background-color: #fca130; }
     |        .delete { background-color: #f93e3e; }
     |        .description { margin: 10px 0; color: #555; }
-    |        .example { background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; margin: 10px 0; border: 1px solid #e1e4e8; }
-    |        .try-it { margin-top: 10px; }
-    |        .try-it button { background-color: #4CAF50; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; }
-    |        .try-it button:hover { background-color: #45a049; }
-    |        .note { background-color: #fff3cd; padding: 10px; border-radius: 4px; margin: 10px 0; }
-    |        code { background: #f0f0f0; padding: 2px 5px; border-radius: 3px; }
-    |        .copy-button { background-color: #6c757d; color: white; border: none; border-radius: 3px; padding: 4px 8px; margin-left: 10px; cursor: pointer; }
+    |        .example { background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; margin: 10px 0; border: 1px solid #e1e4e8; position: relative; }
+    |        .copy-button {
+    |            position: absolute;
+    |            top: 5px;
+    |            right: 5px;
+    |            background-color: #6c757d;
+    |            color: white;
+    |            border: none;
+    |            border-radius: 3px;
+    |            padding: 4px 8px;
+    |            cursor: pointer;
+    |            font-size: 12px;
+    |        }
     |        .copy-button:hover { background-color: #5a6268; }
-    |        .test-interface { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; }
-    |        input, textarea { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; }
+    |        .copy-button.copied { background-color: #28a745; }
+    |        .command { margin-right: 50px; }
     |    </style>
     |    <script>
-    |        function copyToClipboard(text) {
-    |            navigator.clipboard.writeText(text).then(() => {
-    |                alert('Command copied to clipboard!');
+    |        function copyCommand(element, command) {
+    |            navigator.clipboard.writeText(command).then(() => {
+    |                element.textContent = 'Copied!';
+    |                element.classList.add('copied');
+    |                setTimeout(() => {
+    |                    element.textContent = 'Copy';
+    |                    element.classList.remove('copied');
+    |                }, 2000);
+    |            }).catch(err => {
+    |                console.error('Failed to copy:', err);
+    |                element.textContent = 'Failed!';
+    |                setTimeout(() => {
+    |                    element.textContent = 'Copy';
+    |                }, 2000);
     |            });
-    |        }
-    |
-    |        function sendRequest(method, endpoint, body = null) {
-    |            const baseUrl = 'https://scala-backendv1.onrender.com';
-    |            const url = baseUrl + endpoint;
-    |            const options = {
-    |                method: method,
-    |                headers: {
-    |                    'Content-Type': 'application/json'
-    |                }
-    |            };
-    |            if (body) {
-    |                options.body = body;
-    |            }
-    |            fetch(url, options)
-    |                .then(response => response.json())
-    |                .then(data => {
-    |                    document.getElementById('response').value = JSON.stringify(data, null, 2);
-    |                })
-    |                .catch(error => {
-    |                    document.getElementById('response').value = 'Error: ' + error.message;
-    |                });
     |        }
     |    </script>
     |</head>
@@ -83,20 +78,12 @@ object Main extends App {
     |    <div class="container">
     |        <h1>🚀 User Management API Documentation</h1>
     |
-    |        <div class="note">
-    |            <strong>Important:</strong> These endpoints are REST APIs and should be called using appropriate HTTP tools (like curl, Postman) or programming languages.
-    |            They cannot be accessed directly through a browser URL.
-    |        </div>
-    |
     |        <div class="endpoint">
     |            <span class="method get">GET</span> <code>/health</code>
     |            <div class="description">Check if the API is up and running.</div>
     |            <div class="example">
-    |                curl -X GET "https://scala-backendv1.onrender.com/health"
-    |                <button class="copy-button" onclick="copyToClipboard('curl -X GET \"https://scala-backendv1.onrender.com/health\"')">Copy</button>
-    |            </div>
-    |            <div class="try-it">
-    |                <button onclick="sendRequest('GET', '/health')">Try it!</button>
+    |                <div class="command">curl -X GET "https://scala-backendv1.onrender.com/health"</div>
+    |                <button class="copy-button" onclick="copyCommand(this, 'curl -X GET \"https://scala-backendv1.onrender.com/health\"')">Copy</button>
     |            </div>
     |        </div>
     |
@@ -104,11 +91,8 @@ object Main extends App {
     |            <span class="method get">GET</span> <code>/api/users</code>
     |            <div class="description">Get all users in the system.</div>
     |            <div class="example">
-    |                curl -X GET "https://scala-backendv1.onrender.com/api/users"
-    |                <button class="copy-button" onclick="copyToClipboard('curl -X GET \"https://scala-backendv1.onrender.com/api/users\"')">Copy</button>
-    |            </div>
-    |            <div class="try-it">
-    |                <button onclick="sendRequest('GET', '/api/users')">Try it!</button>
+    |                <div class="command">curl -X GET "https://scala-backendv1.onrender.com/api/users"</div>
+    |                <button class="copy-button" onclick="copyCommand(this, 'curl -X GET \"https://scala-backendv1.onrender.com/api/users\"')">Copy</button>
     |            </div>
     |        </div>
     |
@@ -116,22 +100,10 @@ object Main extends App {
     |            <span class="method post">POST</span> <code>/api/users</code>
     |            <div class="description">Create a new user.</div>
     |            <div class="example">
-    |                curl -X POST "https://scala-backendv1.onrender.com/api/users" \<br>
-    |                -H "Content-Type: application/json" \<br>
-    |                -d '{"name": "John Doe", "email": "john@example.com", "age": 30}'
-    |                <button class="copy-button" onclick="copyToClipboard('curl -X POST \"https://scala-backendv1.onrender.com/api/users\" -H \"Content-Type: application/json\" -d \'{\"name\": \"John Doe\", \"email\": \"john@example.com\", \"age\": 30}\'')">Copy</button>
-    |            </div>
-    |            <div class="try-it">
-    |                <button onclick="sendRequest('POST', '/api/users', JSON.stringify({
-    |                    name: document.getElementById('userName').value,
-    |                    email: document.getElementById('userEmail').value,
-    |                    age: parseInt(document.getElementById('userAge').value)
-    |                }))">Try it!</button>
-    |                <div class="test-interface">
-    |                    <input type="text" id="userName" placeholder="Name (e.g., John Doe)" />
-    |                    <input type="email" id="userEmail" placeholder="Email (e.g., john@example.com)" />
-    |                    <input type="number" id="userAge" placeholder="Age (e.g., 30)" />
-    |                </div>
+    |                <div class="command">curl -X POST "https://scala-backendv1.onrender.com/api/users" \\
+    |                    -H "Content-Type: application/json" \\
+    |                    -d '{"name": "John Doe", "email": "john@example.com", "age": 30}'</div>
+    |                <button class="copy-button" onclick="copyCommand(this, 'curl -X POST \"https://scala-backendv1.onrender.com/api/users\" -H \"Content-Type: application/json\" -d \'{\"name\": \"John Doe\", \"email\": \"john@example.com\", \"age\": 30}\'')">Copy</button>
     |            </div>
     |        </div>
     |
@@ -139,12 +111,8 @@ object Main extends App {
     |            <span class="method get">GET</span> <code>/api/users/{id}</code>
     |            <div class="description">Get a specific user by ID.</div>
     |            <div class="example">
-    |                curl -X GET "https://scala-backendv1.onrender.com/api/users/123"
-    |                <button class="copy-button" onclick="copyToClipboard('curl -X GET \"https://scala-backendv1.onrender.com/api/users/123\"')">Copy</button>
-    |            </div>
-    |            <div class="try-it">
-    |                <input type="text" id="getUserId" placeholder="Enter user ID" />
-    |                <button onclick="sendRequest('GET', '/api/users/' + document.getElementById('getUserId').value)">Try it!</button>
+    |                <div class="command">curl -X GET "https://scala-backendv1.onrender.com/api/users/123"</div>
+    |                <button class="copy-button" onclick="copyCommand(this, 'curl -X GET \"https://scala-backendv1.onrender.com/api/users/123\"')">Copy</button>
     |            </div>
     |        </div>
     |
@@ -152,23 +120,10 @@ object Main extends App {
     |            <span class="method put">PUT</span> <code>/api/users/{id}</code>
     |            <div class="description">Update an existing user.</div>
     |            <div class="example">
-    |                curl -X PUT "https://scala-backendv1.onrender.com/api/users/123" \<br>
-    |                -H "Content-Type: application/json" \<br>
-    |                -d '{"name": "John Updated", "email": "john.updated@example.com", "age": 31}'
-    |                <button class="copy-button" onclick="copyToClipboard('curl -X PUT \"https://scala-backendv1.onrender.com/api/users/123\" -H \"Content-Type: application/json\" -d \'{\"name\": \"John Updated\", \"email\": \"john.updated@example.com\", \"age\": 31}\'')">Copy</button>
-    |            </div>
-    |            <div class="try-it">
-    |                <input type="text" id="updateUserId" placeholder="Enter user ID to update" />
-    |                <div class="test-interface">
-    |                    <input type="text" id="updateName" placeholder="Updated name" />
-    |                    <input type="email" id="updateEmail" placeholder="Updated email" />
-    |                    <input type="number" id="updateAge" placeholder="Updated age" />
-    |                </div>
-    |                <button onclick="sendRequest('PUT', '/api/users/' + document.getElementById('updateUserId').value, JSON.stringify({
-    |                    name: document.getElementById('updateName').value,
-    |                    email: document.getElementById('updateEmail').value,
-    |                    age: parseInt(document.getElementById('updateAge').value)
-    |                }))">Try it!</button>
+    |                <div class="command">curl -X PUT "https://scala-backendv1.onrender.com/api/users/123" \\
+    |                    -H "Content-Type: application/json" \\
+    |                    -d '{"name": "John Updated", "email": "john.updated@example.com", "age": 31}'</div>
+    |                <button class="copy-button" onclick="copyCommand(this, 'curl -X PUT \"https://scala-backendv1.onrender.com/api/users/123\" -H \"Content-Type: application/json\" -d \'{\"name\": \"John Updated\", \"email\": \"john.updated@example.com\", \"age\": 31}\'')">Copy</button>
     |            </div>
     |        </div>
     |
@@ -176,29 +131,22 @@ object Main extends App {
     |            <span class="method delete">DELETE</span> <code>/api/users/{id}</code>
     |            <div class="description">Delete a user by ID.</div>
     |            <div class="example">
-    |                curl -X DELETE "https://scala-backendv1.onrender.com/api/users/123"
-    |                <button class="copy-button" onclick="copyToClipboard('curl -X DELETE \"https://scala-backendv1.onrender.com/api/users/123\"')">Copy</button>
-    |            </div>
-    |            <div class="try-it">
-    |                <input type="text" id="deleteUserId" placeholder="Enter user ID to delete" />
-    |                <button onclick="sendRequest('DELETE', '/api/users/' + document.getElementById('deleteUserId').value)">Try it!</button>
+    |                <div class="command">curl -X DELETE "https://scala-backendv1.onrender.com/api/users/123"</div>
+    |                <button class="copy-button" onclick="copyCommand(this, 'curl -X DELETE \"https://scala-backendv1.onrender.com/api/users/123\"')">Copy</button>
     |            </div>
     |        </div>
-    |
-    |        <h2>Response</h2>
-    |        <textarea id="response" rows="10" readonly style="width: 100%; margin-top: 10px;" placeholder="Response will appear here..."></textarea>
     |
     |        <h2>Response Format</h2>
     |        <p>All responses are in JSON format. Success responses have a 2xx status code. Errors have appropriate 4xx or 5xx status codes with error messages.</p>
     |
     |        <h2>Example Response</h2>
     |        <div class="example">
-    |        {
-    |            "id": "123",
-    |            "name": "John Doe",
-    |            "email": "john@example.com",
-    |            "age": 30
-    |        }
+    |            <div class="command">{
+    |    "id": "123",
+    |    "name": "John Doe",
+    |    "email": "john@example.com",
+    |    "age": 30
+    |}</div>
     |        </div>
     |    </div>
     |</body>
