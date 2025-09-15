@@ -38,7 +38,7 @@ object Main extends App {
     |        .put { background-color: #fca130; }
     |        .delete { background-color: #f93e3e; }
     |        .description { margin: 10px 0; color: #555; }
-    |        .example { background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; margin: 10px 0; border: 1px solid #e1e4e8; position: relative; }
+    |        .example { background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; margin: 10px 0; border: 1px solid #e1e4e8; position: relative; white-space: pre-wrap; }
     |        .copy-button {
     |            position: absolute;
     |            top: 5px;
@@ -57,7 +57,8 @@ object Main extends App {
     |    </style>
     |    <script>
     |        function copyCommand(element, command) {
-    |            navigator.clipboard.writeText(command).then(() => {
+    |            const finalCommand = command.replace(/\\n\s*/g, ' ').replace(/\\\\/g, '\\');
+    |            navigator.clipboard.writeText(finalCommand).then(() => {
     |                element.textContent = 'Copied!';
     |                element.classList.add('copied');
     |                setTimeout(() => {
@@ -83,7 +84,7 @@ object Main extends App {
     |            <div class="description">Check if the API is up and running.</div>
     |            <div class="example">
     |                <div class="command">curl -X GET "https://scala-backendv1.onrender.com/health"</div>
-    |                <button class="copy-button" onclick="copyCommand(this, 'curl -X GET \"https://scala-backendv1.onrender.com/health\"')">Copy</button>
+    |                <button class="copy-button" onclick='copyCommand(this, `curl -X GET "https://scala-backendv1.onrender.com/health"`)'>Copy</button>
     |            </div>
     |        </div>
     |
@@ -92,7 +93,7 @@ object Main extends App {
     |            <div class="description">Get all users in the system.</div>
     |            <div class="example">
     |                <div class="command">curl -X GET "https://scala-backendv1.onrender.com/api/users"</div>
-    |                <button class="copy-button" onclick="copyCommand(this, 'curl -X GET \"https://scala-backendv1.onrender.com/api/users\"')">Copy</button>
+    |                <button class="copy-button" onclick='copyCommand(this, `curl -X GET "https://scala-backendv1.onrender.com/api/users"`)'>Copy</button>
     |            </div>
     |        </div>
     |
@@ -100,10 +101,10 @@ object Main extends App {
     |            <span class="method post">POST</span> <code>/api/users</code>
     |            <div class="description">Create a new user.</div>
     |            <div class="example">
-    |                <div class="command">curl -X POST "https://scala-backendv1.onrender.com/api/users" \\
-    |                    -H "Content-Type: application/json" \\
-    |                    -d '{"name": "John Doe", "email": "john@example.com", "age": 30}'</div>
-    |                <button class="copy-button" onclick="copyCommand(this, 'curl -X POST \"https://scala-backendv1.onrender.com/api/users\" -H \"Content-Type: application/json\" -d \'{\"name\": \"John Doe\", \"email\": \"john@example.com\", \"age\": 30}\'')">Copy</button>
+    |                <div class="command">curl -X POST "https://scala-backendv1.onrender.com/api/users" \
+    |    -H "Content-Type: application/json" \
+    |    -d '{"name": "John Doe", "email": "john@example.com", "age": 30}'</div>
+    |                <button class="copy-button" onclick='copyCommand(this, `curl -X POST "https://scala-backendv1.onrender.com/api/users" -H "Content-Type: application/json" -d '{"name": "John Doe", "email": "john@example.com", "age": 30}'`)'>Copy</button>
     |            </div>
     |        </div>
     |
@@ -112,7 +113,7 @@ object Main extends App {
     |            <div class="description">Get a specific user by ID.</div>
     |            <div class="example">
     |                <div class="command">curl -X GET "https://scala-backendv1.onrender.com/api/users/123"</div>
-    |                <button class="copy-button" onclick="copyCommand(this, 'curl -X GET \"https://scala-backendv1.onrender.com/api/users/123\"')">Copy</button>
+    |                <button class="copy-button" onclick='copyCommand(this, `curl -X GET "https://scala-backendv1.onrender.com/api/users/123"`)'>Copy</button>
     |            </div>
     |        </div>
     |
@@ -120,10 +121,10 @@ object Main extends App {
     |            <span class="method put">PUT</span> <code>/api/users/{id}</code>
     |            <div class="description">Update an existing user.</div>
     |            <div class="example">
-    |                <div class="command">curl -X PUT "https://scala-backendv1.onrender.com/api/users/123" \\
-    |                    -H "Content-Type: application/json" \\
-    |                    -d '{"name": "John Updated", "email": "john.updated@example.com", "age": 31}'</div>
-    |                <button class="copy-button" onclick="copyCommand(this, 'curl -X PUT \"https://scala-backendv1.onrender.com/api/users/123\" -H \"Content-Type: application/json\" -d \'{\"name\": \"John Updated\", \"email\": \"john.updated@example.com\", \"age\": 31}\'')">Copy</button>
+    |                <div class="command">curl -X PUT "https://scala-backendv1.onrender.com/api/users/123" \
+    |    -H "Content-Type: application/json" \
+    |    -d '{"name": "John Updated", "email": "john.updated@example.com", "age": 31}'</div>
+    |                <button class="copy-button" onclick='copyCommand(this, `curl -X PUT "https://scala-backendv1.onrender.com/api/users/123" -H "Content-Type: application/json" -d '{"name": "John Updated", "email": "john.updated@example.com", "age": 31}'`)'>Copy</button>
     |            </div>
     |        </div>
     |
@@ -132,7 +133,7 @@ object Main extends App {
     |            <div class="description">Delete a user by ID.</div>
     |            <div class="example">
     |                <div class="command">curl -X DELETE "https://scala-backendv1.onrender.com/api/users/123"</div>
-    |                <button class="copy-button" onclick="copyCommand(this, 'curl -X DELETE \"https://scala-backendv1.onrender.com/api/users/123\"')">Copy</button>
+    |                <button class="copy-button" onclick='copyCommand(this, `curl -X DELETE "https://scala-backendv1.onrender.com/api/users/123"`)'>Copy</button>
     |            </div>
     |        </div>
     |
